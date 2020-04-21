@@ -1,6 +1,6 @@
 module Optimise
 
-using ProgressMeter
+using ProgressMeter, Requires
 
 export train!, update!,
 	SGD, Descent, ADAM, Momentum, Nesterov, RMSProp,
@@ -9,5 +9,9 @@ export train!, update!,
 
 include("optimisers.jl")
 include("train.jl")
+
+function __init__()
+	@require MPI="da04e1cc-30fd-572f-bb4f-1f8673147195" include("mpi.jl")
+end
 
 end
