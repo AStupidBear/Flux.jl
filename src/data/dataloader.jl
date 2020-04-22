@@ -119,9 +119,9 @@ If `shuffle=true`, shuffles the observations each time iterations are re-started
 If `partial=false`, drops the last mini-batch/sequqnce if it is smaller than the batchsize/seqlen.
 If `partial=false`, drops the last mini-batch/sequqnce if it is smaller than the batchsize/seqlen.
 
-If `format=:return_sequence`, return a sequence of mini-batches of length `seqlen`.
-If `format=:time_last`, return ans array of size `(..., batchsize, seqlen)`.
-If `format=:batch_last`, return an array of size `(..., seqlen, batchsize)`.
+If `format=:return_sequence`, return a sequence of mini-batches of length `seqlen` which is useful for RNNs in Flux.
+If `format=:time_last`, return ans array of size `(..., batchsize, seqlen)` which is a convention for RNNs in other deep learning frameworks.
+If `format=:time_first`, return an array of size `(seqlen, ..., batchsize)` which is useful for 1D convolutions in Flux.
 
 The original data is preserved as a tuple in the `data` field of the SequenceLoader.
 """
@@ -169,8 +169,8 @@ function _seqmap(f, xs; format = :return_sequence, copy = true)
     if format == :return_sequence
         y = [selectdim(y, ndims(y), n) for n in 1:size(y, ndims(y))]
         y = copy ? Base.copy.(y) : y
-    elseif format == :batch_last
-        y = PermutedDimsArray(y, (ndims(y), ndims(y) - 1))
+    elseif format == :time_first
+        y = PermutedDimsArray(y, (ndims(y), 1:(ndims(y) - 1)...))
         y = copy ? Base.copy(y) : y
     end
     return y
